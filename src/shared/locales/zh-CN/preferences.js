@@ -16,6 +16,13 @@ export default {
   'transfer-speed-upload': '上传限速',
   'transfer-speed-download': '下载限速',
   'transfer-speed-unlimited': '不限速',
+  'bt-settings': 'BT 设置',
+  'bt-save-metadata': '保存磁力链接元数据为种子文件',
+  'bt-auto-download-content': '自动开始下载磁力链接、种子的文件',
+  'keep-seeding': '持续做种，直到手动停止',
+  'seed-ratio': '做种分享率',
+  'seed-time': '做种时间',
+  'seed-time-unit': '分钟',
   'task-manage': '任务管理',
   'max-concurrent-downloads': '同时下载的最大任务数',
   'max-connection-per-server': '每个服务器最大连接数',
@@ -56,6 +63,8 @@ export default {
   'mock-user-agent': '模拟用户代理（UA）',
   'app-log-path': '应用日志路径',
   'download-session-path': '下载会话路径',
+  'session-reset': '重置下载会话记录',
+  'session-reset-confirm': '你确定要重置下载会话记录吗?',
   'factory-reset': '恢复初始设置',
   'factory-reset-confirm': '你确定要恢复为初始设置吗?',
   'lab-warning': '⚠️启用实验特性可能造成应用崩溃或数据丢失，请自行决定！',
@@ -69,5 +78,7 @@ export default {
   'baidu-exporter-help': '点此查看使用说明',
   'auto-update': '自动更新',
   'auto-check-update': '自动检查更新',
-  'last-check-update-time': '上次检查更新时间'
+  'last-check-update-time': '上次检查更新时间',
+  'follow-metalink': '自动开始下载磁力链接、种子内的文件',
+  'follow-torrent': '种子下载完后自动下载种子内容'
 }

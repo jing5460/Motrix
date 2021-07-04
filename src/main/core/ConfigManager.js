@@ -19,6 +19,7 @@ import {
   NGOSANG_TRACKERS_BEST_URL_CDN
 } from '@shared/constants'
 import { separateConfig } from '@shared/utils'
+import { reduceTrackerString } from '@shared/utils/tracker'
 
 export default class ConfigManager {
   constructor () {
@@ -51,12 +52,16 @@ export default class ConfigManager {
         'allow-overwrite': false,
         'auto-file-renaming': true,
         'bt-exclude-tracker': EMPTY_STRING,
+        'bt-load-saved-metadata': true,
+        'bt-save-metadata': true,
         'bt-tracker': EMPTY_STRING,
         'continue': true,
         'dht-file-path': getDhtPath(IP_VERSION.V4),
         'dht-file-path6': getDhtPath(IP_VERSION.V6),
         'dht-listen-port': 26701,
         'dir': getUserDownloadsPath(),
+        'follow-metalink': true,
+        'follow-torrent': true,
         'listen-port': 21301,
         'max-concurrent-downloads': 5,
         'max-connection-per-server': getMaxConnectionPerServer(),
@@ -66,6 +71,7 @@ export default class ConfigManager {
         'min-split-size': '1M',
         'no-proxy': EMPTY_STRING,
         'pause': true,
+        'pause-metadata': false,
         'rpc-listen-port': 16800,
         'rpc-secret': EMPTY_STRING,
         'seed-ratio': 1,
@@ -98,6 +104,7 @@ export default class ConfigManager {
         'enable-upnp': true,
         'engine-max-connection-per-server': getMaxConnectionPerServer(),
         'hide-app-menu': is.windows() || is.linux(),
+        'keep-seeding': false,
         'keep-window-state': false,
         'last-check-update-time': 0,
         'last-sync-tracker-time': 0,
@@ -137,6 +144,10 @@ export default class ConfigManager {
     Object.keys(others).forEach(key => {
       this.systemConfig.delete(key)
     })
+
+    // Fix spawn ENAMETOOLONG on Windows
+    const tracker = reduceTrackerString(this.systemConfig.get('bt-tracker'))
+    this.setSystemConfig('bt-tracker', tracker)
   }
 
   fixUserConfig () {

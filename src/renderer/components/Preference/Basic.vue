@@ -144,6 +144,54 @@
           </el-col>
         </el-form-item>
         <el-form-item
+          :label="`${$t('preferences.bt-settings')}: `"
+          :label-width="formLabelWidth"
+        >
+          <el-col class="form-item-sub" :span="24">
+            <el-checkbox v-model="form.btSaveMetadata">
+              {{ $t('preferences.bt-save-metadata') }}
+            </el-checkbox>
+          </el-col>
+          <el-col class="form-item-sub" :span="24">
+            <el-checkbox
+              v-model="form.btAutoDownloadContent"
+            >
+              {{ $t('preferences.bt-auto-download-content') }}
+            </el-checkbox>
+          </el-col>
+          <el-col class="form-item-sub" :span="24">
+            <el-switch
+              v-model="form.keepSeeding"
+              :active-text="$t('preferences.keep-seeding')"
+              @change="onKeepSeedingChange"
+            >
+            </el-switch>
+          </el-col>
+          <el-col class="form-item-sub" :span="24" v-if="!form.keepSeeding">
+            {{ $t('preferences.seed-ratio') }}
+            <el-input-number
+              v-model="form.seedRatio"
+              controls-position="right"
+              :min="1"
+              :max="100"
+              :step="0.1"
+              :label="$t('preferences.seed-ratio')">
+            </el-input-number>
+          </el-col>
+          <el-col class="form-item-sub" :span="24" v-if="!form.keepSeeding">
+            {{ $t('preferences.seed-time') }}
+            ({{ $t('preferences.seed-time-unit') }})
+            <el-input-number
+              v-model="form.seedTime"
+              controls-position="right"
+              :min="60"
+              :max="525600"
+              :step="1"
+              :label="$t('preferences.seed-time')">
+            </el-input-number>
+          </el-col>
+        </el-form-item>
+        <el-form-item
           :label="`${$t('preferences.task-manage')}: `"
           :label-width="formLabelWidth"
         >
@@ -225,9 +273,13 @@
   const initForm = (config) => {
     const {
       autoHideWindow,
+      btSaveMetadata,
       dir,
       engineMaxConnectionPerServer,
+      followMetalink,
+      followTorrent,
       hideAppMenu,
+      keepSeeding,
       keepWindowState,
       locale,
       maxConcurrentDownloads,
@@ -237,18 +289,26 @@
       newTaskShowDownloading,
       noConfirmBeforeDeleteTask,
       openAtLogin,
+      pauseMetadata,
       resumeAllWhenAppLaunched,
       runMode,
+      seedRatio,
+      seedTime,
       taskNotification,
       theme,
       traySpeedometer
     } = config
     const result = {
       autoHideWindow,
+      btAutoDownloadContent: !pauseMetadata,
+      btSaveMetadata,
       continue: config.continue,
       dir,
       engineMaxConnectionPerServer,
+      followMetalink,
+      followTorrent,
       hideAppMenu,
+      keepSeeding,
       keepWindowState,
       locale,
       maxConcurrentDownloads,
@@ -260,6 +320,8 @@
       openAtLogin,
       resumeAllWhenAppLaunched,
       runMode,
+      seedRatio,
+      seedTime,
       taskNotification,
       theme,
       traySpeedometer
@@ -342,12 +404,20 @@
             value: '5M'
           },
           {
+            label: '8 MB/s',
+            value: '8M'
+          },
+          {
             label: '10 MB/s',
             value: '10M'
           },
           {
             label: '20 MB/s',
             value: '20M'
+          },
+          {
+            label: '30 MB/s',
+            value: '30M'
           }
         ]
       },
@@ -389,6 +459,10 @@
         this.$electron.ipcRenderer.send('command',
                                         'application:change-theme', theme)
       },
+      onKeepSeedingChange (enable) {
+        this.form.seedRatio = enable ? 0 : 1
+        this.form.seedTime = enable ? 525600 : 60
+      },
       onDirectorySelected (dir) {
         this.form.dir = dir
       },
@@ -402,14 +476,19 @@
       submitForm (formName) {
         this.$refs[formName].validate((valid) => {
           if (!valid) {
-            console.log('[Motrix] preference form valid:', valid)
+            console.error('[Motrix] preference form valid:', valid)
             return false
           }
 
-          const { runMode, openAtLogin, autoHideWindow } = this.form
+          const { btAutoDownloadContent, runMode, openAtLogin, autoHideWindow } = this.form
           const changed = diffConfig(this.formOriginal, this.form)
           const data = {
             ...changed
+          }
+          if ('btAutoDownloadContent' in changed) {
+            data.pauseMetadata = !btAutoDownloadContent
+            data.followMetalink = btAutoDownloadContent
+            data.followTorrent = btAutoDownloadContent
           }
           console.log('[Motrix] preference changed data:', data)
 
@@ -450,6 +529,3 @@
     }
   }
 </script>
-
-<style lang="scss">
-</style>
